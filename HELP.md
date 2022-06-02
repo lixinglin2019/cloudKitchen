@@ -3,23 +3,20 @@
 
 一、**配置文件说明：**
 
-1.系统制流策 配置文件 ratelimitStrategy.properties 
-    a.计数器 (实现)
-        使用方式：注解 在方法 @CounterRateLimitAnnocation(timeLimit = 1, numLimit = 100)---timelimt：时间范围 单位(分钟)  numLimit:数量限制 
-    b.滑动窗口（预留扩展）
-    c.漏斗桶 （预留扩展）
-    d.令牌桶（预留扩展）
-2. 分配快递策略 配置文件 dispatchCourierStrategy.properties
-   a.MATCH(实现)
-   b.FIFO(实现)
-   c.LRU（预留扩展）
-3. 实时系统--实时策略配置文件 realTimeConsumeQueueStrategy.properties
-   a.PSEUDO_REALTIME (实现) （pseudo_realtime.schedule.period--定时消费频率）
-   b.REAL_TIME（实现）
-   c.SOCKET_REALTIME（预留扩展)
-4. 订单配置策略：orderTest.properties --配置模拟生成订单数量
-
-
+    1.系统制流策 配置文件 ratelimitStrategy.properties：为了保证保证单例性（直接用枚举的写法
+        a.计数器 (实现)使用方式：注解 在方法 @CounterRateLimitAnnocation(timeLimit = 1, numLimit = 100)---timelimt：时间范围 单位(分钟)  numLimit:数量限制
+        b.滑动窗口（预留扩展）
+        c.漏斗桶 （预留扩展）
+        d.令牌桶（预留扩展）
+    2.分配快递策略 配置文件 dispatchCourierStrategy.properties
+        a.MATCH(实现)
+   	    b.FIFO(实现)
+   	    c.LRU（预留扩展）
+    3.实时系统--实时策略配置文件 realTimeConsumeQueueStrategy.properties
+   	    a.PSEUDO_REALTIME (实现) （pseudo_realtime.schedule.period--定时消费频率）
+   	    b.REAL_TIME（实现）
+    	c.SOCKET_REALTIME（预留扩展)
+    4.订单配置策略：orderTest.properties --配置模拟生成订单数量
 二、**系统前置条件**
 
     1.餐厅唯一：为了保证保证单例性（直接用枚举的写法
