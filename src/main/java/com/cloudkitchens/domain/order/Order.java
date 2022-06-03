@@ -4,6 +4,7 @@ import com.cloudkitchens.domain.BaseEntity;
 import com.cloudkitchens.domain.KitchenInstance;
 import com.cloudkitchens.domain.user.Courier;
 import com.cloudkitchens.enums.OrderStateEnum;
+import com.cloudkitchens.util.TimeUtil;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,7 @@ public class Order extends BaseEntity {
         this.kitchenReadyTime = kitchenReadyTime;
     }
     public void setCourierArriveUseTime(long courierArriveUseTime) {
-        log.info("orderId:{}  {}  {}(milliseconds) ",this.getId(), "courier arrive use time", courierArriveUseTime);
+        log.info("orderId:{}  {}  {}(milliseconds) ",this.getId(), " courier arrive use time", courierArriveUseTime);
         this.courierArriveUseTime = courierArriveUseTime;
     }
     public void setCourierArriveTime(long courierArriveTime) {
@@ -70,7 +71,8 @@ public class Order extends BaseEntity {
     }
 
     public void printLog(String event){
-        log.info("orderId:{} {}   at {}(milliseconds) ",this.getId(), event, System.currentTimeMillis());
+        String formatData = TimeUtil.getFormatData(null);
+        log.info("orderId:{} {}   at {} ",this.getId(), event, formatData);
     }
 }
 

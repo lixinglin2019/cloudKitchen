@@ -5,6 +5,7 @@ import com.cloudkitchens.dao.OrderDao;
 import com.cloudkitchens.domain.order.Order;
 import com.cloudkitchens.event.CreateOrderExceptionEvent;
 import com.cloudkitchens.event.CreateOrderSuccessEvent;
+import com.cloudkitchens.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,8 @@ public class OrderService {
         try {
 
             orderDao.save(order);
-            log.info("orderid:{}  order created     at  {}(milliseconds)", order.getId(), System.currentTimeMillis());
+            String formatData = TimeUtil.getFormatData(null);
+            log.info("orderid:{}  order created     at  {} ", order.getId(), formatData);
 
 
             //event-bus 观察者模式 异步解耦

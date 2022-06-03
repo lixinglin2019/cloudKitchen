@@ -1,5 +1,8 @@
 package com.cloudkitchens.util;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class TimeUtil {
 
 
@@ -44,5 +47,19 @@ public class TimeUtil {
     public static long courierArriveKitchenRandomTime(Long userTime) {
         long arriveTimeMillis = System.currentTimeMillis() + userTime;//当前时间顺延
         return arriveTimeMillis;
+    }
+
+    /**
+     * @param time 毫秒
+     * @return
+     */
+    public static String getFormatData(Long time){
+        Date date = new Date();
+        if (time != null) {
+            date.setTime(time);
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss.SSS");
+        String format = sdf.format(date);
+        return format;
     }
 }
