@@ -3,7 +3,7 @@
 
 一、**配置文件说明：**
 
-    1.系统限流策 配置文件 ratelimitStrategy.properties：为了保证保证单例性（直接用枚举的写法
+    1.系统限流策略 配置文件 ratelimitStrategy.properties：为了保证保证单例性（直接用枚举的写法
         a.计数器 (实现)使用方式：注解 在方法 @CounterRateLimitAnnocation(timeLimit = 1, numLimit = 100)---timelimt：时间范围 单位(分钟)  numLimit:数量限制
         b.滑动窗口（预留扩展）
         c.漏斗桶 （预留扩展）
