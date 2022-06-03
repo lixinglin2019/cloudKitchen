@@ -20,16 +20,7 @@ public enum KitchenQueueEnum {
     //餐厅制作完成队列
     public DelayQueue<ReadyDTO> readyQueue = new DelayQueue<ReadyDTO>();
 
-
-
     private KitchenQueueEnum() {
     }
 
-    public LinkedBlockingQueue<Order> getReceiveQueue() {
-        return receiveQueue;
-    }
-
-    public DelayQueue<ReadyDTO> getReadyQueue() {
-        return readyQueue;
-    }
 }

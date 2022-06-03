@@ -51,7 +51,7 @@ class KitchenServiceTest {
 
         kitchenService.kitchenConsumeOrderQueue();//触发消费订单队列逻辑，下面就是参数
 
-        LinkedBlockingQueue<Order> receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.getReceiveQueue();
+        LinkedBlockingQueue<Order> receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.receiveQueue;
 
         String dispathCourierProp = PropertyUtils.getDispathCourierProp("dispathCourier.strategy");
         System.out.println("此时系统使用的dispatchCouier策略是：" + dispathCourierProp);
@@ -85,7 +85,7 @@ class KitchenServiceTest {
 
 
         System.out.println("----随后快递员员进入 优先级队列receiveQueue【优先级依据是到达时间】---");
-        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.getCourierArrivedPriorityQueue();
+        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
 
         for (CourierArriveDTO courierArrivePriorityDto : courierArrivedPriorityQueue) {
             String s = courierArrivePriorityDto.toString();
@@ -117,7 +117,7 @@ class KitchenServiceTest {
 
 
     private void mockCreateOrder2OrderQueue() {
-        LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.getOrderQueue();
+        LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.orderQueue;
         orderQueue.clear();//先清空
         orderService.createOrder();//创建订单，并入队
 

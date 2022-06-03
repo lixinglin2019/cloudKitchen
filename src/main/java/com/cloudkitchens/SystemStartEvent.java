@@ -40,7 +40,7 @@ public class SystemStartEvent implements ApplicationListener<ApplicationReadyEve
 
     private static void pintAverageWaitTimeBeforeSystemExit() {
         System.out.println("系统退出前打印---所有订单的平均等待时间---快递员的平均等待时间");
-        LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.getOrderQueue();
+        LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.orderQueue;
         int size = orderQueue.size();
         long kitchenWaitCourierTime = 0;
         long courierWaitKitchenTime = 0;

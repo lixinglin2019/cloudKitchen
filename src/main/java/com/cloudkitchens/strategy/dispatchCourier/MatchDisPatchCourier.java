@@ -70,7 +70,10 @@ public class MatchDisPatchCourier implements IDispatchCourier {
             courier2OrderDtoPriority.setOrder(order);
             courier2OrderDtoPriority.setCourier(courier);
             courier2OrderDtoPriority.setArriveUseTime(courierArriveUseTime);//作为优先级的条件，默认升序，时间小的排在前面
-            CourierQueueEnum.COURIER_QUEUE.getCourierArrivedPriorityQueue().add(courier2OrderDtoPriority);
+            PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
+            courierArrivedPriorityQueue.put(courier2OrderDtoPriority);
+            System.out.println(Thread.currentThread().getName() + " 生产（快递员到达）队列:" + courier2OrderDtoPriority + ",现在快递员到达数=" + courierArrivedPriorityQueue.size());
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,7 +90,7 @@ public class MatchDisPatchCourier implements IDispatchCourier {
     @Override
     public void couriorConsumeReadyQueue() {
         DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.readyQueue;
-        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.getCourierArrivedPriorityQueue();
+        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
         for (CourierArriveDTO courier2OrderDtoPriority : courierArrivedPriorityQueue) {
             Courier courier = courier2OrderDtoPriority.getCourier();
             Boolean needDelay = Boolean.TRUE;
@@ -104,14 +107,17 @@ public class MatchDisPatchCourier implements IDispatchCourier {
             }
             if (needDelay) {//没找到自己的餐，(餐还没有制作完成)--进入延迟队列
                 Order order = courier2OrderDtoPriority.getOrder();
-                //正常完成时间 - 当前时间差值 =  还需要等待的时间
+                //正常完成时间 - 当前时间 =  还需要等待的时间
                 long readyAtThisTime = order.getKitchenReceiveTime() + order.getPrepTime() * 1000;
-                long delayTime = readyAtThisTime - System.currentTimeMillis();
+                long needWaitTime = readyAtThisTime - System.currentTimeMillis();//还有多久完成
                 CourierDelayDTO courierDelayDto = new CourierDelayDTO();
                 courierDelayDto.setCourierUser(courier);
                 courierDelayDto.setOrder(order);
-                courierDelayDto.setDelayTime(delayTime);
-                CourierQueueEnum.COURIER_QUEUE.getCourierdelayQueue().add(courierDelayDto);
+                courierDelayDto.setNeedWaitTime(needWaitTime);
+                DelayQueue<CourierDelayDTO> courierdelayQueue = CourierQueueEnum.COURIER_QUEUE.courierdelayQueue;
+                courierdelayQueue.put(courierDelayDto);
+                System.out.println(Thread.currentThread().getName() + " 生产（快递员延迟取餐）队列:" + courierDelayDto + ",现在(快递员延迟取餐)数=" + courierdelayQueue.size());
+
             }
         }
     }
@@ -120,9 +126,9 @@ public class MatchDisPatchCourier implements IDispatchCourier {
 
     public void arriveCourierPickupReadyOrder(Order order, DelayQueue<ReadyDTO> readyQueue, PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue, CourierArriveDTO courier2OrderDtoPriority) {
         order.setOrderPickUpTime(System.currentTimeMillis());
-        courierArrivedPriorityQueue.remove(courier2OrderDtoPriority);
+//        courierArrivedPriorityQueue.remove(courier2OrderDtoPriority);
         OrderUtil.setTimeGap(order);
-        readyQueue.remove(order);
+//        readyQueue.remove(order);
 
         OrderUtil.printTImeGap(order);
     }

@@ -11,7 +11,7 @@ public class OrderDao implements BaseDao<Order>{
 
     @Override
     public int save(Order order) {//其实就是把订单放缓存里
-        Map<String, Order> orderCache = OrderQueueEum.ORDER_QUEUE.getOrderCache();
+        Map<String, Order> orderCache = OrderQueueEum.ORDER_QUEUE.orderCache;
         boolean existOrder = orderCache.containsKey(order.getId());
         if (existOrder){
             return 0;

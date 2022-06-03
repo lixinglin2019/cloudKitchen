@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.DelayQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
@@ -26,18 +27,28 @@ public class KitchenService {
      * 2.
      */
     public void kitchenConsumeOrderQueue() {
+        try {
+            Thread.sleep(500);//先等待一下触发生产
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         /**
          * //在这里把队头元素取出并删除--同时在这里通知快递员，
          * 是考虑事务的关联性，二者有关联关系（或者说优先级，如果厨房都没有消费到消息，那么快递就算消费到也是没有意义的）
          */
         try {
-            LinkedBlockingQueue orderQueue = OrderQueueEum.ORDER_QUEUE.getOrderQueue();//单例模式
-            Order order = (Order) orderQueue.poll();//非阻塞等待  从订单队列取出来  --->放入 等待制作队列
+            LinkedBlockingQueue orderQueue = OrderQueueEum.ORDER_QUEUE.orderQueue;//单例模式
+            Order order = (Order) orderQueue.take();//阻塞等待  从订单队列取出来  --->放入 等待制作队列
+
+            System.out.println(Thread.currentThread().getName() + " 消费订单:" + order + ",现在剩余的订单数=" + orderQueue.size());
+
             if (order == null) {//暂时没订单，则直接返回
                 return;
             }
-            LinkedBlockingQueue receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.getReceiveQueue();
+            LinkedBlockingQueue receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.receiveQueue;
             receiveQueue.put(order);//餐厅接单
+            System.out.println(Thread.currentThread().getName() + " 生产（餐厅）接单:" + order + ",现在接单数=" + receiveQueue.size());
+
 
             //同步操作（只是为了代码解耦）
             /**
@@ -76,11 +87,16 @@ public class KitchenService {
      */
 //    @Async
     public void kitchenConsumeReceiveQueue() {
-        LinkedBlockingQueue<Order> receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.getReceiveQueue();//备好的餐
-        Order receiveOrder = receiveQueue.peek();
-        if (receiveOrder == null) {
-            return;
+        LinkedBlockingQueue<Order> receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.receiveQueue;
+        Order receiveOrder = null;
+        try {
+            receiveOrder = receiveQueue.take();
+            System.out.println(Thread.currentThread().getName() + " 消费（餐厅）接单:" + receiveOrder + ",现在接单数=" + receiveQueue.size());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+
 
         //制作完成，
         // 1.修改order信息
@@ -93,9 +109,11 @@ public class KitchenService {
         try {
             ReadyDTO readyDTO = new ReadyDTO();
             readyDTO.setOrder(receiveOrder);
-            KitchenQueueEnum.KITCHEN_QUEUE.readyQueue.put(readyDTO);
+            DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.readyQueue;
+            readyQueue.put(readyDTO);//阻塞
+            System.out.println(Thread.currentThread().getName() + " 生产（餐厅）制作完成订单:" + readyDTO + ",现在接单数=" + readyQueue.size());
 
-            receiveQueue.remove(receiveOrder);//把订单数据从ready队列删除
+//            receiveQueue.remove(receiveOrder);//把订单数据从ready队列删除
         } catch (Exception e) {
             e.printStackTrace();
         }

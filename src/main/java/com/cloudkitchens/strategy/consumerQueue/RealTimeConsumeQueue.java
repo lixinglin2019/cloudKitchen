@@ -26,36 +26,33 @@ public class RealTimeConsumeQueue implements IRealTimeConsumeQueue {
 
         try {
 
-//            kitchenService.consumeOrderQueue();
-//
-//            kitchenService.consumeReceiveQueue();
-//
-//            courierService.arriveCourierConsumeReadyQueue();
-//
-//            courierService.delayCourierConsumeReadyQueue();
-
+            //等待生产
             Thread.sleep(1000);
+
             //TODO 异步消费 orderqueue
             new Thread(() -> {
                 while (true) {
                     kitchenService.kitchenConsumeOrderQueue();
                 }
             }).start();
-            Thread.sleep(2000);
+
+            Thread.sleep(1000);
             //TODO 异步消费 receiveQueue
             new Thread(() -> {
                 while (true) {
                     kitchenService.kitchenConsumeReceiveQueue();
                 }
             }).start();
-            Thread.sleep(2000);
+
+            Thread.sleep(1000);
             //TODO 异步消费 receiveQueue
             new Thread(() -> {
                 while (true) {
                     courierService.arriveCourierConsumeReadyQueue();
                 }
             }).start();
-            Thread.sleep(2000);
+
+            Thread.sleep(1000);
             //根据系统结构设计，该队列，只有在Match策略下才有值，在FIFO策略下是没有值的
             //TODO 异步消费 receiveQueue
             new Thread(() -> {
@@ -63,6 +60,7 @@ public class RealTimeConsumeQueue implements IRealTimeConsumeQueue {
                     courierService.delayCourierConsumeReadyQueue();
                 }
             }).start();
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

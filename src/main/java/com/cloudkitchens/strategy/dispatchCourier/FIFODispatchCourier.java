@@ -47,7 +47,9 @@ public class FIFODispatchCourier implements IDispatchCourier {
             courier2OrderDtoPriority.setArriveUseTime(courierArriveUseTime);
             courier2OrderDtoPriority.setArriveAtTime(courierArriveUseTime+System.currentTimeMillis());
 
-            CourierQueueEnum.COURIER_QUEUE.getCourierArrivedPriorityQueue().add(courier2OrderDtoPriority);
+            PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
+            courierArrivedPriorityQueue.put(courier2OrderDtoPriority);
+            System.out.println(Thread.currentThread().getName() + " 生产（快递员到达）队列:" + courier2OrderDtoPriority + ",现在接单数=" + courierArrivedPriorityQueue.size());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -64,20 +66,28 @@ public class FIFODispatchCourier implements IDispatchCourier {
     @Override
     public void couriorConsumeReadyQueue() {
         DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.readyQueue;
-        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.getCourierArrivedPriorityQueue();
-        CourierArriveDTO courier2OrderPriorityDto = courierArrivedPriorityQueue.peek();
-        if (courier2OrderPriorityDto == null) {//快递员队列 没有人
-            return;
+        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
+        CourierArriveDTO courier2OrderPriorityDto = null;
+        try {
+            courier2OrderPriorityDto = courierArrivedPriorityQueue.take();
+            System.out.println(Thread.currentThread().getName() + " 消费（快递员到达）队列:" + courier2OrderPriorityDto + ",现在快递员到达数=" + courierArrivedPriorityQueue.size());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        ReadyDTO peek = readyQueue.peek();
-        if (peek == null) {//餐厅没有准备好的订单
-            return;
+
+
+        ReadyDTO readyDTO = null;//阻塞
+        try {
+            readyDTO = readyQueue.take();
+            System.out.println(Thread.currentThread().getName() + " 生产（餐厅）制作完成订单:" + readyDTO + ",现在接单数=" + readyQueue.size());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         Courier courier = courier2OrderPriorityDto.getCourier();
         Long arriveAtTime = courier2OrderPriorityDto.getArriveAtTime();
         Long arriveUseTime = courier2OrderPriorityDto.getArriveUseTime();
 
-        Order readOrder = peek.getOrder();
+        Order readOrder = readyDTO.getOrder();
         readOrder.setCourier(courier);//这里才确定该订单被哪个快递员拿到了
         readOrder.setCourierArriveTime(arriveAtTime);
         readOrder.setCourierArriveUseTime(arriveUseTime);
@@ -87,11 +97,11 @@ public class FIFODispatchCourier implements IDispatchCourier {
 
     public void readyPickup(Order order, DelayQueue<ReadyDTO> readyQueue, PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue, CourierArriveDTO courier2OrderDtoPriority) {
         order.setOrderPickUpTime(System.currentTimeMillis());
-        courierArrivedPriorityQueue.remove(courier2OrderDtoPriority);
+//        courierArrivedPriorityQueue.remove(courier2OrderDtoPriority);
 
         OrderUtil.setTimeGap(order);
 
-        readyQueue.remove(order);
+//        readyQueue.remove(order);
 
         OrderUtil.printTImeGap(order);
     }

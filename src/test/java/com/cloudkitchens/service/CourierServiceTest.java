@@ -58,8 +58,8 @@ class CourierServiceTest {
 
         //此时的readyQueue 队列中的值
         //此时的arriveQueue 队列中的值
-        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.getCourierArrivedPriorityQueue();
-        DelayQueue<CourierDelayDTO> courierdelayQueue = CourierQueueEnum.COURIER_QUEUE.getCourierdelayQueue();
+        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
+        DelayQueue<CourierDelayDTO> courierdelayQueue = CourierQueueEnum.COURIER_QUEUE.courierdelayQueue;
         DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.readyQueue;
 
         for (ReadyDTO readyDTO : readyQueue) {
@@ -122,7 +122,7 @@ class CourierServiceTest {
 
             kitchenService.kitchenConsumeReceiveQueue();//制作food(消费receivey队列--->read队列)
 
-            DelayQueue<CourierDelayDTO> courierdelayQueue = CourierQueueEnum.COURIER_QUEUE.getCourierdelayQueue();
+            DelayQueue<CourierDelayDTO> courierdelayQueue = CourierQueueEnum.COURIER_QUEUE.courierdelayQueue;
 
             for (CourierDelayDTO courierDelayDTO : courierdelayQueue) {
                 //如果策略是MATCH --则可能有延时队列
@@ -145,7 +145,7 @@ class CourierServiceTest {
     void createCourier() {
         Courier courier = courierService.createCourier();
         System.out.println("快递被创建：" + courier.toString());
-        List<Courier> allCouriers = CourierQueueEnum.COURIER_QUEUE.getAllCouriers();
+        List<Courier> allCouriers = CourierQueueEnum.COURIER_QUEUE.allCouriers;
         Assert.assertTrue(allCouriers.size() > 0);
         for (Courier courier1 : allCouriers) {
             System.out.println(" 快递被放入内存（Map）中：" + courier1);
@@ -154,7 +154,7 @@ class CourierServiceTest {
 
 
     private void mockCreateOrder2OrderQueue() {
-        LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.getOrderQueue();
+        LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.orderQueue;
         orderQueue.clear();//先清空
         orderService.createOrder();//创建订单，并入队
 

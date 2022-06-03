@@ -15,7 +15,7 @@ public enum CourierQueueEnum {
     /**
      * 所有的快递员列表，在每次创建订单时--同时创建一个 快递员
      */
-    List<Courier> allCouriers = new ArrayList<>();
+    public List<Courier> allCouriers = new ArrayList<>();
 
     /**
      * 快递员按照到达餐厅时间顺序拍好队-放入该队列中
@@ -37,25 +37,14 @@ public enum CourierQueueEnum {
      *
      */
 
-    private PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = new PriorityBlockingQueue<CourierArriveDTO>();//快递员到达餐厅队列
+    public  PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = new PriorityBlockingQueue<CourierArriveDTO>();//快递员到达餐厅队列
 
-    private DelayQueue<CourierDelayDTO> courierdelayQueue = new DelayQueue<CourierDelayDTO>();//快递到达后，餐还没做好，则把这些快递放入延迟队列，（延迟时间=餐厅接收时间+订单耗时-当前系统时间）
+    public  DelayQueue<CourierDelayDTO> courierdelayQueue = new DelayQueue<CourierDelayDTO>();//快递到达后，餐还没做好，则把这些快递放入延迟队列，（延迟时间=餐厅接收时间+订单耗时-当前系统时间）
 
 
     private CourierQueueEnum() {
 
     }
 
-    public List<Courier> getAllCouriers() {
-        return allCouriers;
-    }
 
-
-    public DelayQueue<CourierDelayDTO> getCourierdelayQueue() {
-        return courierdelayQueue;
-    }
-
-    public PriorityBlockingQueue<CourierArriveDTO> getCourierArrivedPriorityQueue() {
-        return courierArrivedPriorityQueue;
-    }
-}
+   }

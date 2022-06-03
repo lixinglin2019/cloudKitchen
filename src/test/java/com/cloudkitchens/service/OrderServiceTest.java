@@ -38,7 +38,7 @@ class OrderServiceTest {
         try {
             orderService.createOrder();
 
-            LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.getOrderQueue();
+            LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.orderQueue;
             orderQueue.clear();//先清空
             System.out.println("order into orderqueue:");
 

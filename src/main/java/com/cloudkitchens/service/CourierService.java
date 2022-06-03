@@ -36,15 +36,25 @@ public class CourierService {
      */
     public synchronized void delayCourierConsumeReadyQueue() {
 
-        DelayQueue<CourierDelayDTO> courierDelayQueue = CourierQueueEnum.COURIER_QUEUE.getCourierdelayQueue();
-        CourierDelayDTO courier2OrderDelayDto = courierDelayQueue.peek();//延迟队列中有值
+        DelayQueue<CourierDelayDTO> courierDelayQueue = CourierQueueEnum.COURIER_QUEUE.courierdelayQueue;
+        CourierDelayDTO courier2OrderDelayDto = null;//延迟队列中有值
+        try {
+            courier2OrderDelayDto = courierDelayQueue.take();
+            System.out.println(Thread.currentThread().getName() + " 消费（快递员延迟取餐）队列:" + courier2OrderDelayDto + ",现在(快递员延迟取餐)数=" + courierDelayQueue.size());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         if (courier2OrderDelayDto == null) {
             return;
         }
-        DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.getReadyQueue();
-        ReadyDTO peek = readyQueue.peek();
-        if (peek == null) {
-            return;
+        DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.readyQueue;
+        ReadyDTO peek = null;//
+        try {
+            peek = readyQueue.take();//阻塞
+            System.out.println(Thread.currentThread().getName() + " 生产（餐厅）制作完成订单:" + peek + ",现在接单数=" + readyQueue.size());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         Order readyOrder = peek.getOrder();//只是取，不删除--说明餐也准备好了
         if (readyOrder == null) {
@@ -75,7 +85,7 @@ public class CourierService {
         String id = String.valueOf(couerierId);
         courier.setId(id);
         //并且该用户，放入所有用户列表中
-        CourierQueueEnum.COURIER_QUEUE.getAllCouriers().add(courier);
+        CourierQueueEnum.COURIER_QUEUE.allCouriers.add(courier);
         return courier;
 
     }
@@ -86,8 +96,8 @@ public class CourierService {
 
         OrderUtil.printTImeGap(order);
         OrderUtil.setTimeGap(order);
-        readyQueue.remove(order);
-        courierDelayQueue.remove(courier2OrderDelayDto);
+//        readyQueue.remove(order);
+//        courierDelayQueue.remove(courier2OrderDelayDto);
     }
 
 

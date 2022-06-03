@@ -18,11 +18,17 @@ public class CreateOrderSuccessListener implements ApplicationListener<CreateOrd
     @Override
     public void onApplicationEvent(CreateOrderSuccessEvent event) {
         Order order = event.getOrder();
-        LinkedBlockingQueue orderQueue = OrderQueueEum.ORDER_QUEUE.getOrderQueue();
-
+        LinkedBlockingQueue orderQueue = OrderQueueEum.ORDER_QUEUE.orderQueue;
 
         //订单入队
-        orderQueue.add(order);//非阻塞，有异常返回
+        try {
+            orderQueue.put(order);//阻塞
+            System.out.println(Thread.currentThread().getName() + " 生产订单:" + order + ",现在生产的订单数=" + orderQueue.size());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
 
 //        原先是同步操作--现在改为异步
 //        //触发消费队列
