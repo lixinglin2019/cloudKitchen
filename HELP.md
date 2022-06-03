@@ -36,6 +36,7 @@
     3.流程图
     具体文件见系统中UML design文件夹
 ![system_design.jpg](system_design.jpg)
+
 四、**系统设计**
 
     1.思考：
