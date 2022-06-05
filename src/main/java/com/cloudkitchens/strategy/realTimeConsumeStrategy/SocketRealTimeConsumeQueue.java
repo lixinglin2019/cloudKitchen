@@ -1,10 +1,10 @@
-package com.cloudkitchens.strategy.consumerQueue;
+package com.cloudkitchens.strategy.realTimeConsumeStrategy;
 
 import com.cloudkitchens.enums.RealTimeConsumeQueueStrategy;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SocketRealTimeConsumeQueue implements IRealTimeConsumeQueue {
+public class SocketRealTimeConsumeQueue implements IRealTimeConsumeType {
     @Override
     public String getType() {
         return RealTimeConsumeQueueStrategy.SOCKET_REALTIME.name();

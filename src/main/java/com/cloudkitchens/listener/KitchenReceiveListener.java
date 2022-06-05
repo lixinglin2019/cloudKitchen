@@ -1,18 +1,14 @@
 package com.cloudkitchens.listener;
 
+import com.cloudkitchens.SystemStartEvent;
 import com.cloudkitchens.domain.order.Order;
 import com.cloudkitchens.domain.user.Courier;
 import com.cloudkitchens.event.KitchenReceiveEvent;
 import com.cloudkitchens.service.CourierService;
-import com.cloudkitchens.strategy.dispatchCourier.IDispatchCourier;
 import com.cloudkitchens.util.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 //餐厅接单
 @Component
@@ -20,18 +16,19 @@ public class KitchenReceiveListener implements ApplicationListener<KitchenReceiv
 
     @Autowired
     private CourierService courierService;
-    Map<String, IDispatchCourier> dispatchCourierStrategyMap = new HashMap<>();
 
-    public KitchenReceiveListener(List<IDispatchCourier> dispatchCourierList) {
-        for (IDispatchCourier iDispatchCourier : dispatchCourierList) {
-            dispatchCourierStrategyMap.put(iDispatchCourier.getType(), iDispatchCourier);
-        }
-    }
 
+    /**
+     *  1.设置订单状态
+     *  2.策略模式安排快递
+     */
 
     @Override
     public void onApplicationEvent(KitchenReceiveEvent event) {
         Order order = event.getOrder();
+        if (order == null) {
+            return;
+        }
         order.setKitchenReceiveTime(System.currentTimeMillis());//设置餐厅 --接单时间
         /**
          * 只有餐厅接收到订单（这个时间节点）--才会安排快递员
@@ -44,7 +41,7 @@ public class KitchenReceiveListener implements ApplicationListener<KitchenReceiv
 
         //2.分配快递员--策略模式（最好异步）
         String dispathCourierProp = PropertyUtils.getDispathCourierProp("dispathCourier.strategy");
-        dispatchCourierStrategyMap.get(dispathCourierProp).disppatchCourier(order, courier);
+        SystemStartEvent.dispatchCourierStrategyMap.get(dispathCourierProp).disppatchCourier(order, courier);
 
 
 

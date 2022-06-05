@@ -9,7 +9,9 @@ import com.cloudkitchens.enums.DispatchCourierStrategyEnum;
 import com.cloudkitchens.enums.queue.CourierQueueEnum;
 import com.cloudkitchens.enums.queue.KitchenQueueEnum;
 import com.cloudkitchens.enums.queue.OrderQueueEum;
+import com.cloudkitchens.util.OrderUtil;
 import com.cloudkitchens.util.PropertyUtils;
+import com.cloudkitchens.util.TimeUtil;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +53,7 @@ class KitchenServiceTest {
 
         kitchenService.kitchenConsumeOrderQueue();//触发消费订单队列逻辑，下面就是参数
 
+        System.out.println("触发");
         LinkedBlockingQueue<Order> receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.receiveQueue;
 
         String dispathCourierProp = PropertyUtils.getDispathCourierProp("dispathCourier.strategy");
@@ -65,7 +68,7 @@ class KitchenServiceTest {
             if (DispatchCourierStrategyEnum.MATCH.name().equals(dispathCourierProp)) {
                 //订单的快递当时就定好了！+ 通知快递员入队[courier-----> courierArriveQueue(快递)delayQueue)]
                 Courier courier = order.getCourier();
-                long courierArriveTime = order.getCourierArriveTime();
+                long courierArriveTime = order.getCourierArriveAtTime();
                 long courierArriveUseTime = order.getCourierArriveUseTime();
                 Assert.assertNotNull(courier);
                 Assert.assertNotNull(courierArriveTime);
@@ -88,11 +91,8 @@ class KitchenServiceTest {
         PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
 
         for (CourierArriveDTO courierArrivePriorityDto : courierArrivedPriorityQueue) {
-            String s = courierArrivePriorityDto.toString();
-            System.out.println("快递到达队列中快递；" + s);
+            System.out.println("快递到达队列中快递；" + courierArrivePriorityDto);
         }
-
-
     }
 
 
@@ -111,7 +111,28 @@ class KitchenServiceTest {
 
         //检查ready队列有没有准备好数据
         DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.readyQueue;
-        Assert.assertTrue("餐厅准好了订单", readyQueue.size() > 0);
+//        Assert.assertTrue("餐厅准好了订单", readyQueue.size() > 0);
+
+        try {
+            Thread.sleep(50000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        while (true){
+            try {
+                ReadyDTO take = readyQueue.take();
+                Order order = take.getOrder();
+                String id = order.getId();
+                Integer prepTime = order.getPrepTime();
+                long kitchenReceiveTime = order.getKitchenReceiveTime();
+                long kitchenReadyTime = order.getKitchenReadyTime();
+                String formatData = TimeUtil.getFormatData(kitchenReadyTime);
+                System.out.println("订单id:"+id+" 制作完成时间："+formatData+" 餐厅接单时间："+ TimeUtil.getFormatData(kitchenReceiveTime)+" 制作需需要时间："+prepTime+" 分钟");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
 
     }
 
@@ -119,7 +140,12 @@ class KitchenServiceTest {
     private void mockCreateOrder2OrderQueue() {
         LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.orderQueue;
         orderQueue.clear();//先清空
-        orderService.createOrder();//创建订单，并入队
+//        orderService.createOrder();//创建订单，并入队
+        try {
+            OrderUtil.simulateConcurrentCreateOrder(orderService);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         System.out.println("order into orderqueue:");
         for (Order order : orderQueue) {

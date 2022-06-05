@@ -1,25 +1,24 @@
 package com.cloudkitchens.service;
 
+import com.cloudkitchens.SystemStartEvent;
 import com.cloudkitchens.domain.order.Order;
 import com.cloudkitchens.dto.ReadyDTO;
+import com.cloudkitchens.enums.ConsumerEnum;
 import com.cloudkitchens.enums.OrderStateEnum;
+import com.cloudkitchens.enums.ProducerEnum;
 import com.cloudkitchens.enums.queue.KitchenQueueEnum;
-import com.cloudkitchens.enums.queue.OrderQueueEum;
 import com.cloudkitchens.event.KitchenReceiveEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 @Service
 public class KitchenService {
 
     @Autowired
     private ApplicationContext applicationContext;
-
+//    private volatile AtomicInteger kitchenReceiveOrderNumer = KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveOrderNumber;
 
     /**
      * 消费订单队列数据
@@ -27,41 +26,39 @@ public class KitchenService {
      * 2.
      */
     public void kitchenConsumeOrderQueue() {
-        try {
-            Thread.sleep(500);//先等待一下触发生产
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        /**
-         * //在这里把队头元素取出并删除--同时在这里通知快递员，
-         * 是考虑事务的关联性，二者有关联关系（或者说优先级，如果厨房都没有消费到消息，那么快递就算消费到也是没有意义的）
-         */
-        try {
-            LinkedBlockingQueue orderQueue = OrderQueueEum.ORDER_QUEUE.orderQueue;//单例模式
-            Order order = (Order) orderQueue.take();//阻塞等待  从订单队列取出来  --->放入 等待制作队列
 
-            System.out.println(Thread.currentThread().getName() + " 消费订单:" + order + ",现在剩余的订单数=" + orderQueue.size());
-
-            if (order == null) {//暂时没订单，则直接返回
-                return;
-            }
-            LinkedBlockingQueue receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.receiveQueue;
-            receiveQueue.put(order);//餐厅接单
-            System.out.println(Thread.currentThread().getName() + " 生产（餐厅）接单:" + order + ",现在接单数=" + receiveQueue.size());
-
-
-            //同步操作（只是为了代码解耦）
+        new Thread(() -> {
             /**
-             *  1.设置订单状态
-             *  2.策略模式安排快递
-             *
+             * //在这里把队头元素取出并删除--同时在这里通知快递员，
+             * 是考虑事务的关联性，二者有关联关系（或者说优先级，如果厨房都没有消费到消息，那么快递就算消费到也是没有意义的）
              */
-            ApplicationEvent applicationEvent = new KitchenReceiveEvent("",order);
-            applicationContext.publishEvent(applicationEvent);
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            while (KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveOrderNumber.get() < SystemStartEvent.orderTotalNumber) {//不停消费
+                try {
+                    //消费
+                    Object consume = SystemStartEvent.consumeMap.get(ConsumerEnum.ORDER_CONSUMER).consume();
+                    if (consume == null) {
+                        return;
+                    }
+                    Order order = (Order) consume;
+
+                    //生产
+//                    SystemStartEvent.producerMap.get(ProducerEnum.KITCHEN_RECEIVE_PRODUCER).produce(order);
+                    SystemStartEvent.producerMap.get(ProducerEnum.KITCHEN_RECEIVE_PRODUCER).produce(order);
+                    //计数器+
+//                    看看这样能否写上？
+                    KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveOrderNumber.getAndIncrement();
+
+
+                    //同步操作（只是为了代码解耦）
+                    ApplicationEvent applicationEvent = new KitchenReceiveEvent("", order);
+                    applicationContext.publishEvent(applicationEvent);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
     }
 
@@ -74,49 +71,43 @@ public class KitchenService {
     /**
      * 默认使用springboot线程池
      * 异步制作食物
-     * @Async异步方法默认使用Spring创建ThreadPoolTaskExecutor。
-     * 默认核心线程数：8，
+     *
+     * @Async异步方法默认使用Spring创建ThreadPoolTaskExecutor。 默认核心线程数：8，
      * 最大线程数：Integet.MAX_VALUE，
      * 队列使用LinkedBlockingQueue，
      * 容量是：Integet.MAX_VALUE，
      * 空闲线程保留时间：60s，
      * 线程池拒绝策略：AbortPolicy。
-     *
+     * <p>
      * 1.异步制作食物
      * 2.做好后入队readyQueue---延时队列
      */
-//    @Async
     public void kitchenConsumeReceiveQueue() {
-        LinkedBlockingQueue<Order> receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.receiveQueue;
-        Order receiveOrder = null;
-        try {
-            receiveOrder = receiveQueue.take();
-            System.out.println(Thread.currentThread().getName() + " 消费（餐厅）接单:" + receiveOrder + ",现在接单数=" + receiveQueue.size());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        new Thread(() -> {
+            while (KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveReadyOrderNumber.get() < SystemStartEvent.orderTotalNumber) {
+                //消费
+                Object consume = SystemStartEvent.consumeMap.get(ConsumerEnum.KITCHEN_RECEIVE_CONSUMER).consume();
+                if (consume == null) {
+                    return;
+                }
+
+                /**
+                 * 准备数据
+                 */
+                Order order = (Order) consume;
+                long kitchenReadyTime = System.currentTimeMillis() + order.getPrepTime();//订单准备好的时间
+                order.setKitchenReadyTime(kitchenReadyTime);
+                order.setState(OrderStateEnum.KITCHEN_FINISHED.state);
+                ReadyDTO readyDTO = new ReadyDTO();
+                readyDTO.setOrder(order);
+
+                //生产
+                SystemStartEvent.producerMap.get(ProducerEnum.KITCHEN_READY_PRODUCER).produce(readyDTO);
+                KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveReadyOrderNumber.getAndIncrement();//i++
+            }
+        }).start();
 
 
-
-        //制作完成，
-        // 1.修改order信息
-        long kitchenReadyTime = System.currentTimeMillis() + receiveOrder.getPrepTime();//订单准备好的时间
-        receiveOrder.setKitchenReadyTime(kitchenReadyTime);
-        receiveOrder.setState(OrderStateEnum.KITCHEN_FINISHED.state);
-
-
-        // 2.order入ready队列！
-        try {
-            ReadyDTO readyDTO = new ReadyDTO();
-            readyDTO.setOrder(receiveOrder);
-            DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.readyQueue;
-            readyQueue.put(readyDTO);//阻塞
-            System.out.println(Thread.currentThread().getName() + " 生产（餐厅）制作完成订单:" + readyDTO + ",现在接单数=" + readyQueue.size());
-
-//            receiveQueue.remove(receiveOrder);//把订单数据从ready队列删除
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 

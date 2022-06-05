@@ -8,37 +8,47 @@ import org.slf4j.LoggerFactory;
 
 public class OrderUtil {
     static Logger log = LoggerFactory.getLogger(OrderUtil.class);
-    public static void printTImeGap(Order order) {
-        long kitchenReadyTime = order.getKitchenReadyTime();
-        long orderPickUpTime = order.getOrderPickUpTime();
-        if (kitchenReadyTime == 0 && orderPickUpTime == 0) {
-            return ;
-        }
-        long l = kitchenReadyTime - orderPickUpTime;
-        if (l > 0) {//快递先到的，餐后来才制作完成
-            log.info("\norderid:{},\ncourier wait time {}(milliseconds) between arrival and order pickup", order.getId(), l);
-        }else{
-            l = Math.abs(l);
-            log.info("\norderid:{},\nfood wait time {}(milliseconds) between order ready and pickup", order.getId(), l);
 
+    public static void printTimegap(Order order) {
+
+        long kitchenWaitCourierTime = order.getKitchenWaitCourierTime();
+        long courierWaitKitchenTime = order.getCourierWaitKitchenTime();
+        if (courierWaitKitchenTime > 0) {//快递先到的，等待餐后来才制作完成
+            log.info("orderid:{},courier wait time {}(milliseconds) between arrival and order pickup", order.getId(), courierWaitKitchenTime);
+        }
+        if (kitchenWaitCourierTime > 0) {
+            log.info("orderid:{},food wait time {}(milliseconds) between order ready and pickup", order.getId(), kitchenWaitCourierTime);
         }
     }
 
 
     public static void setTimeGap(Order order) {
-        long kitchenReadyTime = order.getKitchenReadyTime();
-        long courierArriveTime = order.getCourierArriveTime();
+        long courierArriveTime = order.getCourierArriveAtTime();//快递到达时间
+        long kitchenReadyTime = order.getKitchenReadyTime();//餐厅准备好的时间
+        long orderPickUpTime = order.getOrderPickUpTime();//快递员拣货时间
         //只要有一个值为0，则不做设置
-        if (kitchenReadyTime == 0 || courierArriveTime == 0) {
+        if (kitchenReadyTime == 0 || courierArriveTime == 0 || orderPickUpTime == 0) {
             return;
         }
+
+        String formatData = TimeUtil.getFormatData(courierArriveTime);
+        String formatData1 = TimeUtil.getFormatData(kitchenReadyTime);
+        String formatData2 = TimeUtil.getFormatData(orderPickUpTime);
+        System.out.println("快递到达：" + formatData);
+        System.out.println("餐厅备好：" + formatData1);
+        System.out.println("取餐时间：" + formatData2);
+
+
         long l = kitchenReadyTime - courierArriveTime;
-        if (l > 0) {
-            order.setCourierWaitKitchenTime(l);
-        } else {
-            order.setKitchenWaitCourierTime(Math.abs(l));
+        if (l > 0) {//快递员到了，食物还没准备好
+            long l1 = orderPickUpTime - courierArriveTime;//取餐实际-餐厅准备好的时间
+            order.setCourierWaitKitchenTime(l1);
+        } else {//食物准备好了，快递员还没到--食物等快递员
+            long l1 = orderPickUpTime - kitchenReadyTime;
+            order.setKitchenWaitCourierTime(l1);
         }
     }
+
     /**
      * 下单
      *
@@ -140,10 +150,6 @@ public class OrderUtil {
 //        //
 //        executorService.shutdown();
 //    }
-
-
-
-
 
 
 }

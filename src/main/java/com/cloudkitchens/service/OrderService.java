@@ -21,8 +21,8 @@ public class OrderService {
 
     @Autowired
     private ApplicationContext applicationContext;
-
     private static volatile AtomicInteger orderId = new AtomicInteger(0);
+
 
     public static Logger log = LoggerFactory.getLogger(OrderService.class);
 
@@ -38,7 +38,6 @@ public class OrderService {
             orderDao.save(order);
             String formatData = TimeUtil.getFormatData(null);
             log.info("orderid:{}  order created     at  {} ", order.getId(), formatData);
-
 
             //event-bus 观察者模式 异步解耦
             applicationContext.publishEvent(new CreateOrderSuccessEvent("", order));

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public enum CourierQueueEnum {
     COURIER_QUEUE;
@@ -36,15 +37,16 @@ public enum CourierQueueEnum {
      * 下面两队列都是为FIFO策略准备的，
      *
      */
+    //正常到达队列和延时队列，共用这做一个变量，他俩合起来的和作为判断退出的条件
+    public  volatile AtomicInteger courierPickUpOrderNumer = new AtomicInteger(0);
+
 
     public  PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = new PriorityBlockingQueue<CourierArriveDTO>();//快递员到达餐厅队列
 
     public  DelayQueue<CourierDelayDTO> courierdelayQueue = new DelayQueue<CourierDelayDTO>();//快递到达后，餐还没做好，则把这些快递放入延迟队列，（延迟时间=餐厅接收时间+订单耗时-当前系统时间）
 
-
     private CourierQueueEnum() {
 
     }
-
 
    }

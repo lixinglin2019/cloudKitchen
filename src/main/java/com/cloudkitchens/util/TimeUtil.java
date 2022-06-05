@@ -39,15 +39,6 @@ public class TimeUtil {
     }
 
 
-    /**
-     * 3~15秒 之间的一个时间
-     *
-     * @return
-     */
-    public static long courierArriveKitchenRandomTime(Long userTime) {
-        long arriveTimeMillis = System.currentTimeMillis() + userTime;//当前时间顺延
-        return arriveTimeMillis;
-    }
 
     /**
      * @param time 毫秒

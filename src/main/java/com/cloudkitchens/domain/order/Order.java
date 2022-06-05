@@ -23,7 +23,7 @@ public class Order extends BaseEntity {
     private long kitchenReceiveTime = 0;//餐厅接收时间
     private long kitchenReadyTime = 0;//餐厅制作完成时间
     private long courierArriveUseTime = 0;//3~15 秒 快递到店路上耗时
-    private long courierArriveTime = 0;//快递到店物理时间
+    private long courierArriveAtTime = 0;//快递到店物理时间
     private long orderPickUpTime = 0;//订单被pickup时间
     /**
      * --耗时点在快递员
@@ -44,34 +44,34 @@ public class Order extends BaseEntity {
 
     public void setCourier(Courier courier) {
 
-        printLog(" courier dispatched ");
+        printLog("courier dispatched",System.currentTimeMillis());
         this.courier = courier;
     }
 
     public void setKitchenReceiveTime(long kitchenReceiveTime) {
-        printLog(" order received ");
+        printLog("order received    ",kitchenReceiveTime);
         this.kitchenReceiveTime = kitchenReceiveTime;
     }
     public void setKitchenReadyTime(long kitchenReadyTime) {
-        printLog( " order ready ");
+        printLog("order ready       ",kitchenReadyTime);
         this.kitchenReadyTime = kitchenReadyTime;
     }
     public void setCourierArriveUseTime(long courierArriveUseTime) {
-        log.info("orderId:{}  {}  {}(milliseconds) ",this.getId(), " courier arrive use time", courierArriveUseTime);
+        log.info("orderId:{} {} {}(milliseconds) ",this.getId(), "courier arrive use time", courierArriveUseTime);
         this.courierArriveUseTime = courierArriveUseTime;
     }
-    public void setCourierArriveTime(long courierArriveTime) {
-        printLog(" courier arrived ");
-        this.courierArriveTime = courierArriveTime;
+    public void setCourierArriveAtTime(long courierArriveAtTime) {
+        printLog("courier arrived   ",courierArriveAtTime);
+        this.courierArriveAtTime = courierArriveAtTime;
     }
 
     public void setOrderPickUpTime(long orderPickUpTime) {
-        printLog(" order picked up ");
+        printLog("order picked up   ",orderPickUpTime);
         this.orderPickUpTime = orderPickUpTime;
     }
 
-    public void printLog(String event){
-        String formatData = TimeUtil.getFormatData(null);
+    public void printLog(String event,long time){
+        String formatData = TimeUtil.getFormatData(time);
         log.info("orderId:{} {}   at {} ",this.getId(), event, formatData);
     }
 }

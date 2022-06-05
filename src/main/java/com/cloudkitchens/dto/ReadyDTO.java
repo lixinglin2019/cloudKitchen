@@ -17,13 +17,18 @@ public class ReadyDTO implements Delayed {
     public long getDelay(TimeUnit unit) {
         int prepTime = order.getPrepTime() * 1000;
         long kitchenReceiveTime = order.getKitchenReceiveTime();
-        long sourceDuration = prepTime + kitchenReceiveTime;
-        return unit.convert(sourceDuration, TimeUnit.MILLISECONDS);//从现在开始时间点开始+准备消耗时间=准备结束的实际点
+        long finishTime = prepTime + kitchenReceiveTime;
+        return unit.convert(finishTime, TimeUnit.MILLISECONDS);//从现在开始时间点开始+准备消耗时间=准备结束的实际点
     }
 
     @Override
     public int compareTo(Delayed o) {
         long f = this.getDelay(TimeUnit.MILLISECONDS) - o.getDelay(TimeUnit.MILLISECONDS);
         return (int) f;
+    }
+
+    public static void main(String[] args) {
+        Order order = new Order();
+
     }
 }

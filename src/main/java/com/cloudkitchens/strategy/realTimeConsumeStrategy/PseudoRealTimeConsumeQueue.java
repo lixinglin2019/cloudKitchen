@@ -1,4 +1,4 @@
-package com.cloudkitchens.strategy.consumerQueue;
+package com.cloudkitchens.strategy.realTimeConsumeStrategy;
 
 import com.cloudkitchens.enums.RealTimeConsumeQueueStrategy;
 import com.cloudkitchens.service.CourierService;
@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class PseudoRealTimeConsumeQueue implements IRealTimeConsumeQueue {
+public class PseudoRealTimeConsumeQueue implements IRealTimeConsumeType {
 
     @Autowired
     private CourierService courierService;
