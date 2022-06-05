@@ -12,17 +12,21 @@
         a.MATCH(实现)
    	    b.FIFO(实现)
    	    c.LRU（预留扩展）
-    3.系统实时策略 配置文件 realTimeConsumeQueueStrategy.properties
-   	    a.PSEUDO_REALTIME (实现) （pseudo_realtime.schedule.period--定时消费频率，如果定义为0，则和REAL_TIME一样的效果）
-   	    b.REAL_TIME（实现）
-    	c.SOCKET_REALTIME（预留扩展)
+
+[//]: # (    3.系统实时策略 配置文件 realTimeConsumeQueueStrategy.properties)
+
+[//]: # (   	    a.PSEUDO_REALTIME &#40;实现&#41; （pseudo_realtime.schedule.period--定时消费频率，如果定义为0，则和REAL_TIME一样的效果）)
+
+[//]: # (   	    b.REAL_TIME（实现）)
+
+[//]: # (    	c.SOCKET_REALTIME（预留扩展&#41;)
     4.订单配置 ：orderTest.properties --配置模拟生成订单数量
 二、**系统前置条件**
 
     1.餐厅唯一：为了保证保证单例性（直接用枚举的写法）
 
     2.核心队列
-        订单队列:          orderQueue(LinkedBlockingQueue)
+        订单队列:         orderQueue(LinkedBlockingQueue)
         餐厅接单队列:      receiveQueue (LinkedBlockingQueue<Order> )
         餐厅制作完成队列:   readyQueue(DelayQueue<ReadyDTO>);
         快递员到达队列:     courierArrivedPriorityQueue(PriorityQueue<CourierArriveDTO>)
@@ -36,6 +40,8 @@
     3.流程图
     具体文件见系统中UML design文件夹
 ![system_design.jpg](system_design.jpg)
+![code_construct.png](code_construct.png)
+
 
 四、**系统设计**
 
@@ -87,7 +93,7 @@
     1.做了限流控制
     2.ConcurrentHashMap--加锁map
     3.synchronized --加锁
-    4.AtomicInter 原子类 保证id生成的唯一性
+    4.AtomicInter 原子类 a.保证id生成的唯一性,b.计数器--消费队列while 结束条件 
     5.Volital --可见性 保证线程安全 
     6.队列用到LinkedBlockingQueue 基于Volital和CAS 自旋 保证线程安全
     7.PriorityBlockingQueue  ----也是线程安全的
