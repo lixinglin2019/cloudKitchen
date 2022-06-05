@@ -28,7 +28,13 @@ public class ReadyDTO implements Delayed {
     }
 
     public static void main(String[] args) {
-        Order order = new Order();
+        for (int i = 0; i < 5; i++) {
+
+            Order order = new Order();
+            order.setId(i+"");
+            order.setPrepTime(i*1000);
+            order.setKitchenReceiveTime(System.currentTimeMillis()+1000);
+        }
 
     }
 }

@@ -56,10 +56,18 @@ class CourierServiceTest {
 
         kitchenService.kitchenConsumeReceiveQueue();//制作food(消费receivey队列--->read队列)
 
-        //此时的readyQueue 队列中的值
-        //此时的arriveQueue 队列中的值
-        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //延迟取餐快递
         DelayQueue<CourierDelayDTO> courierdelayQueue = CourierQueueEnum.COURIER_QUEUE.courierdelayQueue;
+
+        //到达的快递
+        PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
+
+        //准备好的餐
         DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.readyQueue;
 
         for (ReadyDTO readyDTO : readyQueue) {

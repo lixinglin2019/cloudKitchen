@@ -19,6 +19,7 @@ import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class MatchDisPatchCourier implements IDispatchCourier {
@@ -31,10 +32,9 @@ public class MatchDisPatchCourier implements IDispatchCourier {
      */
     @Override
     public void couriorConsumeReadyQueue() {
+        AtomicInteger courierPickUpOrderNumer = CourierQueueEnum.COURIER_QUEUE.courierPickUpOrderNumer;
         new Thread(() -> {
-
-
-            while (CourierQueueEnum.COURIER_QUEUE.courierPickUpOrderNumer.get() <SystemStartEvent.orderTotalNumber) {
+            while (courierPickUpOrderNumer.get() < SystemStartEvent.orderTotalNumber) {
                 //消费-已到达的快递员
                 PriorityBlockingQueue<CourierArriveDTO> courierArrivedPriorityQueue = CourierQueueEnum.COURIER_QUEUE.courierArrivedPriorityQueue;
                 Iterator<CourierArriveDTO> courierArriveDTOIterator = courierArrivedPriorityQueue.iterator();
@@ -61,10 +61,13 @@ public class MatchDisPatchCourier implements IDispatchCourier {
                             OrderUtil.setTimeGap(order);
                             OrderUtil.printTimegap(order);
 
-                            CourierQueueEnum.COURIER_QUEUE.courierPickUpOrderNumer.getAndIncrement();
+                            int andIncrement = courierPickUpOrderNumer.getAndIncrement();
+                            if (andIncrement == SystemStartEvent.orderTotalNumber-1) {
+                                OrderUtil.pintOrderCache();
+                            }
                         }
                     }
-                    if (needDelay){//进入快递员delay队列
+                    if (needDelay) {//进入快递员delay队列
                         /**
                          * 准备数据
                          */
@@ -109,11 +112,11 @@ public class MatchDisPatchCourier implements IDispatchCourier {
         long courierArriveAtTime = randomUseTime + currentTimeMillis;
 
 
-        String formatData = TimeUtil.getFormatData(currentTimeMillis);
-        System.out.println("当前时间：" + formatData);
-        System.out.println("快递路上花费时间（毫秒)：" + randomUseTime);
-        String formatData1 = TimeUtil.getFormatData(courierArriveAtTime);
-        System.out.println("快递应该到达时间：" + formatData1);
+//        String formatData = TimeUtil.getFormatData(currentTimeMillis);
+//        System.out.println("当前时间：" + formatData);
+//        System.out.println("快递路上花费时间（毫秒)：" + randomUseTime);
+//        String formatData1 = TimeUtil.getFormatData(courierArriveAtTime);
+//        System.out.println("快递应该到达时间：" + formatData1);
 
 
         order.setCourier(courier);  //------match体现在这里------

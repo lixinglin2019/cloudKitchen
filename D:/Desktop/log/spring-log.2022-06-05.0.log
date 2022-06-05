@@ -1,0 +1,35 @@
+21:37:49.393 [main] INFO  c.c.OrderDeliveryApplication - Starting OrderDeliveryApplication using Java 1.8.0_181 on lixldemcbookpro with PID 98156 (/Users/lixl/IdeaProjects/cloudKitchens/target/classes started by lixl in /Users/lixl/IdeaProjects/cloudKitchens)
+21:37:49.396 [main] INFO  c.c.OrderDeliveryApplication - No active profile set, falling back to 1 default profile: "default"
+21:37:50.786 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+21:37:50.795 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+21:37:50.796 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+21:37:50.796 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.63]
+21:37:50.908 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+21:37:50.908 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1444 ms
+21:37:52.748 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+21:37:52.769 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+21:37:52.779 [main] INFO  c.c.OrderDeliveryApplication - Started OrderDeliveryApplication in 4.015 seconds (JVM running for 4.642)
+21:37:52.803 [main] INFO  c.cloudkitchens.service.OrderService - orderid:1  order created     at  2022-06-05 21:37:52.803 
+21:37:52.805 [main] INFO  c.cloudkitchens.service.OrderService - orderid:2  order created     at  2022-06-05 21:37:52.805 
+21:37:52.805 [main] INFO  c.cloudkitchens.service.OrderService - orderid:3  order created     at  2022-06-05 21:37:52.805 
+21:37:53.814 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:1 order received       at 2022-06-05 21:37:53.813 
+21:37:53.816 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:1 courier dispatched   at 2022-06-05 21:37:53.816 
+21:37:53.816 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:1 courier arrive use time 9000(milliseconds) 
+21:37:53.816 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:1 courier arrived      at 2022-06-05 21:38:02.816 
+21:37:53.817 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:2 order received       at 2022-06-05 21:37:53.817 
+21:37:53.817 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:2 courier dispatched   at 2022-06-05 21:37:53.817 
+21:37:53.818 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:2 courier arrive use time 3000(milliseconds) 
+21:37:53.818 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:2 courier arrived      at 2022-06-05 21:37:56.817 
+21:37:53.818 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:3 order received       at 2022-06-05 21:37:53.818 
+21:37:53.818 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:3 courier dispatched   at 2022-06-05 21:37:53.818 
+21:37:53.818 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:3 courier arrive use time 8000(milliseconds) 
+21:37:53.819 [Thread-13] INFO  com.cloudkitchens.domain.order.Order - orderId:3 courier arrived      at 2022-06-05 21:38:01.818 
+21:37:54.814 [Thread-14] INFO  com.cloudkitchens.domain.order.Order - orderId:1 order ready          at 2022-06-05 21:37:54.822 
+21:37:54.816 [Thread-14] INFO  com.cloudkitchens.domain.order.Order - orderId:2 order ready          at 2022-06-05 21:37:54.824 
+21:37:54.816 [Thread-14] INFO  com.cloudkitchens.domain.order.Order - orderId:3 order ready          at 2022-06-05 21:37:54.824 
+21:37:55.821 [Thread-15] INFO  com.cloudkitchens.domain.order.Order - orderId:2 order picked up      at 2022-06-05 21:37:55.821 
+21:38:01.735 [Thread-15] INFO  com.cloudkitchens.util.OrderUtil - orderid:2,food wait time 997(milliseconds) between order ready and pickup
+21:38:01.736 [Thread-15] INFO  com.cloudkitchens.domain.order.Order - orderId:1 order picked up      at 2022-06-05 21:38:01.736 
+21:38:01.737 [Thread-15] INFO  com.cloudkitchens.util.OrderUtil - orderid:1,food wait time 6914(milliseconds) between order ready and pickup
+21:38:01.737 [Thread-15] INFO  com.cloudkitchens.domain.order.Order - orderId:3 order picked up      at 2022-06-05 21:38:01.737 
+21:38:01.737 [Thread-15] INFO  com.cloudkitchens.util.OrderUtil - orderid:3,food wait time 6913(milliseconds) between order ready and pickup

@@ -23,23 +23,26 @@ public class CourierService {
      * 消费 readQueue
      */
     public void delayCourierConsumeReadyQueue() {
+        AtomicInteger courierPickUpOrderNumer = CourierQueueEnum.COURIER_QUEUE.courierPickUpOrderNumer;
         new Thread(() -> {
-
-            while (CourierQueueEnum.COURIER_QUEUE.courierPickUpOrderNumer.get() < SystemStartEvent.orderTotalNumber) {
+            while (courierPickUpOrderNumer.get() < SystemStartEvent.orderTotalNumber) {
                 //消费
-                Object consume = SystemStartEvent.consumeMap.get(ConsumerEnum.COURIER_DELAY_CONSUMER).consume();
-                if (consume == null) {
+                Object courior = SystemStartEvent.consumeMap.get(ConsumerEnum.COURIER_DELAY_CONSUMER).consume();
+                if (courior == null) {
                     return;
                 }
 
                 //消费
-                Object consume1 = SystemStartEvent.consumeMap.get(ConsumerEnum.KITCHEN_READY_CONSUMER).consume();
-                if (consume1 == null) {
+                Object food = SystemStartEvent.consumeMap.get(ConsumerEnum.KITCHEN_READY_CONSUMER).consume();
+                if (food == null) {
                     return;
                 }
-                CourierQueueEnum.COURIER_QUEUE.courierPickUpOrderNumer.getAndIncrement();
+                int andIncrement = courierPickUpOrderNumer.getAndIncrement();
+                if (andIncrement == SystemStartEvent.orderTotalNumber-1) {
+                    OrderUtil.pintOrderCache();
+                }
 
-                ReadyDTO peek = (ReadyDTO) consume1;
+                ReadyDTO peek = (ReadyDTO) food;
                 Order order = peek.getOrder();//只是取，不删除--说明餐也准备好了
                 order.setOrderPickUpTime(System.currentTimeMillis());
                 OrderUtil.printTimegap(order);

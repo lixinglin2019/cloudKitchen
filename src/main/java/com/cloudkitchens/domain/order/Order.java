@@ -74,5 +74,25 @@ public class Order extends BaseEntity {
         String formatData = TimeUtil.getFormatData(time);
         log.info("orderId:{} {}   at {} ",this.getId(), event, formatData);
     }
+
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id='" + getId() + '\'' +
+                ", name='" + name + '\'' +
+                ", prepTime=" + prepTime +
+                ", kitchen=" + kitchen +
+                ", courier=" + courier +
+                ", kitchenReceiveTime=" + kitchenReceiveTime +
+                ", kitchenReadyTime=" + kitchenReadyTime +
+                ", courierArriveUseTime=" + courierArriveUseTime +
+                ", courierArriveAtTime=" + courierArriveAtTime +
+                ", orderPickUpTime=" + orderPickUpTime +
+                ", kitchenWaitCourierTime=" + kitchenWaitCourierTime +
+                ", courierWaitKitchenTime=" + courierWaitKitchenTime +
+                ", state=" + state +
+                '}';
+    }
 }
 

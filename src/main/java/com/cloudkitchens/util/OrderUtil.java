@@ -1,9 +1,13 @@
 package com.cloudkitchens.util;
 
 import com.cloudkitchens.domain.order.Order;
+import com.cloudkitchens.enums.queue.OrderQueueEum;
 import com.cloudkitchens.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Set;
 
 
 public class OrderUtil {
@@ -31,12 +35,12 @@ public class OrderUtil {
             return;
         }
 
-        String formatData = TimeUtil.getFormatData(courierArriveTime);
-        String formatData1 = TimeUtil.getFormatData(kitchenReadyTime);
-        String formatData2 = TimeUtil.getFormatData(orderPickUpTime);
-        System.out.println("快递到达：" + formatData);
-        System.out.println("餐厅备好：" + formatData1);
-        System.out.println("取餐时间：" + formatData2);
+//        String formatData = TimeUtil.getFormatData(courierArriveTime);
+//        String formatData1 = TimeUtil.getFormatData(kitchenReadyTime);
+//        String formatData2 = TimeUtil.getFormatData(orderPickUpTime);
+//        System.out.println("快递到达：" + formatData);
+//        System.out.println("餐厅备好：" + formatData1);
+//        System.out.println("取餐时间：" + formatData2);
 
 
         long l = kitchenReadyTime - courierArriveTime;
@@ -151,5 +155,17 @@ public class OrderUtil {
 //        executorService.shutdown();
 //    }
 
+    public static void pintOrderCache() {
+
+        System.out.println("内存中订单现状");
+        Map<String, Order> orderCache = OrderQueueEum.ORDER_QUEUE.orderCache;
+        Set<String> strings = orderCache.keySet();
+        for (String string : strings) {
+            Order order = orderCache.get(string);
+            System.out.println(order);
+        }
+
+
+    }
 
 }

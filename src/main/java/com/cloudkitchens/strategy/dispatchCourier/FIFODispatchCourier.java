@@ -13,6 +13,8 @@ import com.cloudkitchens.util.OrderUtil;
 import com.cloudkitchens.util.TimeUtil;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Component
 public class FIFODispatchCourier implements IDispatchCourier {
 
@@ -61,9 +63,9 @@ public class FIFODispatchCourier implements IDispatchCourier {
      */
     @Override
     public void couriorConsumeReadyQueue() {
+        AtomicInteger courierPickUpOrderNumer = CourierQueueEnum.COURIER_QUEUE.courierPickUpOrderNumer;
         new Thread(() -> {
-
-            while (CourierQueueEnum.COURIER_QUEUE.courierPickUpOrderNumer.get() < SystemStartEvent.orderTotalNumber) {
+            while (courierPickUpOrderNumer.get() < SystemStartEvent.orderTotalNumber) {
                 //消费
                 Object courierDTO = SystemStartEvent.consumeMap.get(ConsumerEnum.COURIER_ARRIVED_CONSUMER).consume();//优先级队列
                 if (courierDTO == null) {
@@ -92,7 +94,10 @@ public class FIFODispatchCourier implements IDispatchCourier {
                 OrderUtil.setTimeGap(readOrder);
                 OrderUtil.printTimegap(readOrder);
 
-                CourierQueueEnum.COURIER_QUEUE.courierPickUpOrderNumer.getAndIncrement();
+                int andIncrement = courierPickUpOrderNumer.getAndIncrement();
+                if (andIncrement == SystemStartEvent.orderTotalNumber-1) {
+                    OrderUtil.pintOrderCache();
+                }
             }
         }).start();
 

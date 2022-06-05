@@ -53,6 +53,12 @@ class KitchenServiceTest {
 
         kitchenService.kitchenConsumeOrderQueue();//触发消费订单队列逻辑，下面就是参数
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         System.out.println("触发");
         LinkedBlockingQueue<Order> receiveQueue = KitchenQueueEnum.KITCHEN_QUEUE.receiveQueue;
 
@@ -102,37 +108,42 @@ class KitchenServiceTest {
     @Test
     void kitchenConsumeReceiveQueue() {
 
+        //先清空数据
+        OrderQueueEum.ORDER_QUEUE.orderQueue.clear();
+        KitchenQueueEnum.KITCHEN_QUEUE.receiveQueue.clear();
+
         //MOCK 订单数据入队到order
         mockCreateOrder2OrderQueue();
 
-        kitchenService.kitchenConsumeOrderQueue();//触发消费订单队列逻辑
+        kitchenService.kitchenConsumeOrderQueue();//触发消费订单队列逻辑--此时餐厅接单（receiveQueue有值）+安排了快递到店（courierArriveQueue有值）
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         kitchenService.kitchenConsumeReceiveQueue();//制作food(消费receivey队列--->read队列)
 
         //检查ready队列有没有准备好数据
         DelayQueue<ReadyDTO> readyQueue = KitchenQueueEnum.KITCHEN_QUEUE.readyQueue;
-//        Assert.assertTrue("餐厅准好了订单", readyQueue.size() > 0);
 
-        try {
-            Thread.sleep(50000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        while (true){
-            try {
-                ReadyDTO take = readyQueue.take();
-                Order order = take.getOrder();
-                String id = order.getId();
-                Integer prepTime = order.getPrepTime();
-                long kitchenReceiveTime = order.getKitchenReceiveTime();
-                long kitchenReadyTime = order.getKitchenReadyTime();
-                String formatData = TimeUtil.getFormatData(kitchenReadyTime);
-                System.out.println("订单id:"+id+" 制作完成时间："+formatData+" 餐厅接单时间："+ TimeUtil.getFormatData(kitchenReceiveTime)+" 制作需需要时间："+prepTime+" 分钟");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
+        System.out.println("下面是餐厅制作完成的订单队列，他们按照 制作完成时间出队");
+//        因为是遍历delayqueue,所以只能利用队列特性来take()取值---这样才能取出来是按照时间delay的
+            
+
+        for (ReadyDTO readyDTO : readyQueue) {
+
+            Order order = readyDTO.getOrder();
+            String id = order.getId();
+            Integer prepTime = order.getPrepTime();
+            long kitchenReceiveTime = order.getKitchenReceiveTime();
+            long kitchenReadyTime = order.getKitchenReadyTime();
+            String formatData = TimeUtil.getFormatData(kitchenReadyTime);
+            System.out.println("订单id:" + id + " 制作完成时间：" + formatData + " 餐厅接单时间：" + TimeUtil.getFormatData(kitchenReceiveTime) + " 制作需需要时间：" + prepTime + " 分钟");
         }
+
 
     }
 

@@ -6,7 +6,6 @@ import com.cloudkitchens.enums.ConsumerEnum;
 import com.cloudkitchens.enums.ProducerEnum;
 import com.cloudkitchens.enums.queue.OrderQueueEum;
 import com.cloudkitchens.produce.Iproduce;
-import com.cloudkitchens.service.OrderService;
 import com.cloudkitchens.strategy.dispatchCourier.IDispatchCourier;
 import com.cloudkitchens.strategy.realTimeConsumeStrategy.IRealTimeConsumeType;
 import com.cloudkitchens.strategy.realTimeConsumeStrategy.RealTimeConsumeQueue;
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Set;
 
 /**
  * 系统启动后，自动触发调用
@@ -33,12 +32,6 @@ public class SystemStartEvent implements ApplicationListener<ApplicationReadyEve
 
     @Autowired
     RealTimeConsumeQueue realTimeConsumeQueue;
-
-    @Autowired
-    private OrderService orderService;
-
-
-
 
     static Logger log = LoggerFactory.getLogger(SystemStartEvent.class);
     public static Integer orderTotalNumber;
@@ -52,11 +45,15 @@ public class SystemStartEvent implements ApplicationListener<ApplicationReadyEve
 
     private static void pintAverageWaitTimeBeforeSystemExit() {
         System.out.println("系统退出前打印---所有订单的平均等待时间---快递员的平均等待时间");
-        LinkedBlockingQueue<Order> orderQueue = OrderQueueEum.ORDER_QUEUE.orderQueue;
-        int size = orderQueue.size();
         long kitchenWaitCourierTime = 0;
         long courierWaitKitchenTime = 0;
-        for (Order order : orderQueue) {
+
+        Map<String, Order> orderCache = OrderQueueEum.ORDER_QUEUE.orderCache;
+        int size = orderCache.size();
+
+        Set<String> strings = orderCache.keySet();
+        for (String string : strings) {
+            Order order = orderCache.get(string);
             kitchenWaitCourierTime += order.getKitchenWaitCourierTime();
             courierWaitKitchenTime += order.getCourierWaitKitchenTime();
         }

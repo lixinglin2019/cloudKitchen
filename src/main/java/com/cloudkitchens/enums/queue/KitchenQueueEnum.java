@@ -26,6 +26,4 @@ public enum KitchenQueueEnum {
 
     private KitchenQueueEnum() {
     }
-
-
 }

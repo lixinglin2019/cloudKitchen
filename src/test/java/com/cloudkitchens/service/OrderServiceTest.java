@@ -47,7 +47,7 @@ class OrderServiceTest {
             for (Order order : orderQueue) {
                 System.out.println(order);
             }
-
+            orderQueue.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }

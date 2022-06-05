@@ -23,4 +23,11 @@ public class Courier extends BaseUser {
     public int hashCode() {
         return Objects.hash(super.hashCode(), phone, DeliveryStatus, score);
     }
+
+    @Override
+    public String toString() {
+        return "Courier{" +
+                "id='" + getId() +
+                '}';
+    }
 }

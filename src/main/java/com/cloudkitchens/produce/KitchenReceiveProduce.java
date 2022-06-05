@@ -24,11 +24,11 @@ public class KitchenReceiveProduce<T> implements Iproduce {
         //队列中设置值
         Order order = (Order) object;
         try {
-            //这里每次第二次添加，第一次添加的就丢了，又变成0了！！---
-//            fix这个bug
-            ((LinkedBlockingQueue)this.queue()).put(order);
+
+            queue().add(order);//这里阻塞的话死活添加不上--改为offer就可以
+//            queue().offer(order);//这里阻塞的话死活添加不上--改为offer就可以
             System.out.println(Thread.currentThread().getName() + " 生产（餐厅）接单:" + object + ",现在接单数=" + queue().size());
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

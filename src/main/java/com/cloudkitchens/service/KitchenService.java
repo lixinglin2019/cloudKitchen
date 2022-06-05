@@ -13,6 +13,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Service
 public class KitchenService {
 
@@ -26,14 +28,9 @@ public class KitchenService {
      * 2.
      */
     public void kitchenConsumeOrderQueue() {
-
+        AtomicInteger kitchenReceiveOrderNumber = KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveOrderNumber;
         new Thread(() -> {
-            /**
-             * //在这里把队头元素取出并删除--同时在这里通知快递员，
-             * 是考虑事务的关联性，二者有关联关系（或者说优先级，如果厨房都没有消费到消息，那么快递就算消费到也是没有意义的）
-             */
-
-            while (KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveOrderNumber.get() < SystemStartEvent.orderTotalNumber) {//不停消费
+            while (kitchenReceiveOrderNumber.get() < SystemStartEvent.orderTotalNumber) {
                 try {
                     //消费
                     Object consume = SystemStartEvent.consumeMap.get(ConsumerEnum.ORDER_CONSUMER).consume();
@@ -47,7 +44,7 @@ public class KitchenService {
                     SystemStartEvent.producerMap.get(ProducerEnum.KITCHEN_RECEIVE_PRODUCER).produce(order);
                     //计数器+
 //                    看看这样能否写上？
-                    KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveOrderNumber.getAndIncrement();
+                    kitchenReceiveOrderNumber.getAndIncrement();
 
 
                     //同步操作（只是为了代码解耦）
@@ -58,6 +55,10 @@ public class KitchenService {
                     e.printStackTrace();
                 }
             }
+            /**
+             * //在这里把队头元素取出并删除--同时在这里通知快递员，
+             * 是考虑事务的关联性，二者有关联关系（或者说优先级，如果厨房都没有消费到消息，那么快递就算消费到也是没有意义的）
+             */
         }).start();
 
     }
@@ -83,8 +84,9 @@ public class KitchenService {
      * 2.做好后入队readyQueue---延时队列
      */
     public void kitchenConsumeReceiveQueue() {
+        AtomicInteger kitchenReceiveReadyOrderNumber = KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveReadyOrderNumber;
         new Thread(() -> {
-            while (KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveReadyOrderNumber.get() < SystemStartEvent.orderTotalNumber) {
+            while (kitchenReceiveReadyOrderNumber.get() < SystemStartEvent.orderTotalNumber) {
                 //消费
                 Object consume = SystemStartEvent.consumeMap.get(ConsumerEnum.KITCHEN_RECEIVE_CONSUMER).consume();
                 if (consume == null) {
@@ -103,7 +105,7 @@ public class KitchenService {
 
                 //生产
                 SystemStartEvent.producerMap.get(ProducerEnum.KITCHEN_READY_PRODUCER).produce(readyDTO);
-                KitchenQueueEnum.KITCHEN_QUEUE.kitchenReceiveReadyOrderNumber.getAndIncrement();//i++
+                kitchenReceiveReadyOrderNumber.getAndIncrement();//i++
             }
         }).start();
 
