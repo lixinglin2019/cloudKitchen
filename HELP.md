@@ -1,7 +1,7 @@
 # Getting Started
 
 
-一、**配置文件说明：**
+一、配置文件说明
 
     1.系统限流策略 配置文件 ratelimitStrategy.properties
         a.计数器 (实现)使用方式：注解 在方法 @CounterRateLimitAnnocation(timeLimit = 1, numLimit = 100)---timelimt：时间范围 单位(分钟)  numLimit:数量限制
@@ -13,7 +13,7 @@
    	    b.FIFO(实现)
    	    c.LRU（预留扩展）
 
-[//]: # (    3.系统实时策略 配置文件 realTimeConsumeQueueStrategy.properties)
+[//]: # (    3.系****统实时策略 配置文件 realTimeCo****nsumeQueueStrategy.properties)
 
 [//]: # (   	    a.PSEUDO_REALTIME &#40;实现&#41; （pseudo_realtime.schedule.period--定时消费频率，如果定义为0，则和REAL_TIME一样的效果）)
 

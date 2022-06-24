@@ -9,11 +9,17 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 @Data
 public class Order extends BaseEntity {
 
     Logger log = LoggerFactory.getLogger(Order.class);
+
+    @NotNull
     private String name;
+    @Min(value = 0,message = "制作时间不允许为负数")
     private Integer prepTime;//单位：秒
     private KitchenInstance kitchen = KitchenInstance.getInstance();//单例模式，订单默认下到该餐厅
 

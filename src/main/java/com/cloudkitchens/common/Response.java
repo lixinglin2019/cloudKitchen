@@ -9,11 +9,9 @@ import java.io.Serializable;
 @ApiModel("前端响应对象")
 @Data
 public class Response<T> implements Serializable {
+    public static ResultCode success = ResultCode.SUCCESS;
 
-
-    public static ErrorCodeEum success = ErrorCodeEum.SUCCESS;
-
-    public static ErrorCodeEum FAIL = ErrorCodeEum.FAIL;
+    public static ResultCode FAIL = ResultCode.FAIL;
 
     @ApiModelProperty("响应码")
     private int code;

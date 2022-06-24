@@ -5,14 +5,17 @@
 
 package com.cloudkitchens.common;
 
-public enum ErrorCodeEum  {
+public enum ResultCode implements StatusCode {
     SUCCESS(0, "success"),
-    FAIL(1, "fail");
+    FAIL(1, "fail"),
+    VALIDATE_ERROR(2, "validate error"),
+
+    RESPONSE_PACKAGE_ERROR(3, "response package error");
 
     private int code;
     private String msg;
 
-    private ErrorCodeEum(int code, String msg) {
+    private ResultCode(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }
